@@ -114,7 +114,10 @@ class PlayerBrawl extends FlxSprite
 					
 			case "hitFloor1":
 				if (animation.finished)
+				{
 					animation.play("idle");
+					weapon.animation.play("idle");
+				}
 				else if (FlxG.keys.anyJustPressed(["X"]))
 				{
 					animation.play("hitFloor2");					
