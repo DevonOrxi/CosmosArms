@@ -31,7 +31,7 @@ class PlayState extends FlxState
 	{
 		super.create();
 		
-		loader = new FlxOgmoLoader("assets/data/cz.oel");
+		loader = new FlxOgmoLoader("assets/data/sandbox.oel");
 		
 		backgroundLevel = loader.loadTilemap("assets/images/mininicular.png", 16, 16, "bTiles");
 		
@@ -44,7 +44,7 @@ class PlayState extends FlxState
 		
 		space = new FlxSprite();
 		space.loadGraphic("assets/images/space.png", true, 720, 480);
-		space.animation.add("space", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 30, true);
+		space.animation.add("space", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 15, true);
 		space.animation.play("space");
 		space.scrollFactor.x = 0;
 		space.scrollFactor.y = 0;
@@ -57,12 +57,14 @@ class PlayState extends FlxState
 		transparent.scrollFactor.x = 0;
 		transparent.scrollFactor.y = 0;
 		
+		
 		FlxG.camera.follow(player);
 		
+		add(space);
 		add(player.get_weapon());
 		add(backgroundLevel);
 		add(foregroundLevel);
-		//add(enemy);
+		add(enemy);
 		add(player);
 		add(transparent);
 	}
@@ -73,8 +75,10 @@ class PlayState extends FlxState
 	}
 	
 	override public function update():Void
-	{
+	{		
+		super.update();
 		
+		FlxG.overlap(foregroundLevel, player, null, FlxObject.separate);
 		
 		if (FlxG.pixelPerfectOverlap(enemy, player.get_weapon()) &&
 			player.get_weapon().get_enemyHitList().members.indexOf(enemy) == -1
@@ -84,15 +88,15 @@ class PlayState extends FlxState
 			trace("HIT");
 		}
 		
-		super.update();
-		
-		FlxG.collide(foregroundLevel, player);
-		
 		var screenXY:FlxPoint = player.get_weapon().getScreenXY();
 		FlxSpriteUtil.fill(transparent, 0x00000000);
-		playerFrame.loadGraphic(player.get_weapon().framePixels);
-		spaceFrame.loadGraphic(space.framePixels);
-		transparent.stamp(playerFrame, Std.int(screenXY.x - player.get_weapon().offset.x), Std.int( screenXY.y - player.get_weapon().offset.y));		
+		playerFrame.loadGraphic(player.get_weapon().getFlxFrameBitmapData());
+		spaceFrame.loadGraphic(space.getFlxFrameBitmapData());
+		transparent.stamp(
+			playerFrame,
+			Std.int(screenXY.x - player.get_weapon().offset.x),
+			Std.int( screenXY.y - player.get_weapon().offset.y)
+		);		
 		FlxSpriteUtil.alphaMaskFlxSprite(spaceFrame, transparent, transparent);
 	}	
 }

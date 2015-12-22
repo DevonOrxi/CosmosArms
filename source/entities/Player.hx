@@ -36,8 +36,8 @@ class Player extends FlxSprite
 		
 		animation.play("idle");
 		
-		drag.x = Reg.movementSpeed*4;
-		acceleration.y = Reg.jumpForce*2.5;
+		drag.x = Reg.movementSpeed;
+		acceleration.y = Reg.gravity;
 		maxVelocity = FlxPoint.weak(Reg.maxPlayerVelocityX, Reg.maxPlayerVelocityY);
 		
 		weapon = new Attack();
@@ -86,8 +86,8 @@ class Player extends FlxSprite
 				}
 				
 			case "prejump":
-					velocity.y = -Reg.jumpForce * 1.2;
-					acceleration.y = Reg.jumpForce * 3;
+					velocity.y = -Reg.jumpForceSpeed;
+					acceleration.y = Reg.gravity;
 					animation.play("jumping");
 				
 			case "jumping":

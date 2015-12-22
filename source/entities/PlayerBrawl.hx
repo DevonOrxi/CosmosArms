@@ -12,8 +12,8 @@ import flixel.util.FlxSpriteUtil;
  */
 class PlayerBrawl extends FlxSprite
 {
-	private var canJump:Bool = false;
 	@:isVar private var weapon(get, null):BrawlAttack;
+	private var jumpTimer:Float = 0;
 
 	public function new(X:Int, Y:Int) 
 	{
@@ -22,12 +22,12 @@ class PlayerBrawl extends FlxSprite
 		x = X;
 		y = Y;
 		
-		loadGraphic("assets/images/character.png", true, 128, 128);
+		loadGraphic("assets/images/charTest.png", true, 128, 128);
 		
 		animation.add("idle", [0], 12, false);
-		animation.add("walk", [6, 7, 8, 9], 8, true);
-		animation.add("hitFloor1", [12, 13, 14, 15, 16], 15, false);
-		animation.add("hitFloor2", [18, 19, 20, 21, 22, 23, 24], 15, false);
+		animation.add("walk", [7, 8, 9], 8, true);
+		animation.add("hitFloor1", [12, 13, 14, 15, 16,17], 20, false);
+		animation.add("hitFloor2", [18, 19, 20, 21, 22, 23], 20, false);
 		animation.add("prejump", [0,0], 30, false);
 		animation.add("jumping", [1,1], 30, false);
 		animation.add("landing", [0,0], 20, false);		
@@ -39,9 +39,10 @@ class PlayerBrawl extends FlxSprite
 		offset.x = 46;
 		offset.y = 34;
 		
-		drag.x = Reg.movementSpeed*4;
-		acceleration.y = Reg.jumpForce*2.5;
-		maxVelocity = FlxPoint.weak(Reg.maxPlayerVelocityX, Reg.maxPlayerVelocityY);
+		drag.x = Reg.movementSpeed * 4;
+		acceleration.y = Reg.gravity;
+		
+		maxVelocity.set(Reg.maxPlayerVelocityX, Reg.maxPlayerVelocityY);
 		
 		weapon = new BrawlAttack();
 	}
@@ -50,9 +51,9 @@ class PlayerBrawl extends FlxSprite
 	{
 		playerInput();
 		
-		super.update();
+		weapon.setPosition(x, y);	
 		
-		weapon.setPosition(x, y);
+		super.update();
 	}
 	
 	private function playerInput()
@@ -62,10 +63,13 @@ class PlayerBrawl extends FlxSprite
 		switch(animation.name)
 		{
 			case "idle":
-				moveLeftRight(true);			
+				moveLeftRight(true);
 				
-				if (FlxG.keys.anyJustPressed(["UP", "Z"]) && velocity.y == 0)
+				if (FlxG.keys.anyJustPressed(["UP", "Z"]) && isTouching(FlxObject.DOWN))
+				{
 					animation.play("prejump");
+					weapon.animation.play("prejump");
+				}
 				else if (FlxG.keys.anyJustPressed(["X"]))
 				{
 					animation.play("hitFloor1");
@@ -75,8 +79,11 @@ class PlayerBrawl extends FlxSprite
 			case "walk":
 				moveLeftRight(true);
 				
-				if (FlxG.keys.anyJustPressed(["UP", "Z"]) && velocity.y == 0)
+				if (FlxG.keys.anyJustPressed(["UP", "Z"]) && isTouching(FlxObject.DOWN))
+				{
 					animation.play("prejump");
+					weapon.animation.play("prejump");
+				}
 				else if (FlxG.keys.anyJustPressed(["X"]))
 				{
 					animation.play("hitFloor1");
@@ -89,19 +96,48 @@ class PlayerBrawl extends FlxSprite
 				}
 				
 			case "prejump":
-					velocity.y = -Reg.jumpForce * 1.2;
-					acceleration.y = Reg.jumpForce * 3;
+					velocity.y = -Reg.jumpForceSpeed;
 					animation.play("jumping");
+					weapon.animation.play("jumping");
+					jumpTimer = 0;
 				
 			case "jumping":
-				moveLeftRight(false);			
+				moveLeftRight(false);
 				
-				if (velocity.y == 0)
-					if(acceleration.x == 0)
+				if (isTouching(FlxObject.DOWN))
+					if (acceleration.x == 0)
+					{
 						animation.play("landing");
+						weapon.animation.play("landing");
+					}
 					else
+					{
 						animation.play("walk");
-					
+						weapon.animation.play("walk");
+						}
+				else
+				{
+					if (jumpTimer < Reg.maxJumpTime)
+					{
+						jumpTimer += FlxG.elapsed;
+						
+						if (FlxG.keys.anyPressed(["UP", "Z"]))
+							{velocity.y -= 18; acceleration.y = Reg.gravity / 2;}
+						else
+						{
+							jumpTimer = Reg.maxJumpTime;
+							acceleration.y = Reg.gravity;
+						}
+					}
+					else
+					{
+						jumpTimer = Reg.maxJumpTime;
+						acceleration.y = Reg.gravity;
+					}
+				}
+				
+				trace(acceleration.y);
+				
 			case "landing":
 				
 				if (animation.finished)
@@ -109,7 +145,12 @@ class PlayerBrawl extends FlxSprite
 					animation.play("idle");					
 					weapon.animation.play("idle");
 				}
-				else 
+				else if (FlxG.keys.anyJustPressed(["UP", "Z"]) && isTouching(FlxObject.DOWN))
+				{
+					animation.play("prejump");
+					weapon.animation.play("prejump");
+				}
+				else
 					moveLeftRight(true);
 					
 			case "hitFloor1":
@@ -142,7 +183,11 @@ class PlayerBrawl extends FlxSprite
 				flipX = true;
 				weapon.flipX = true;
 				acceleration.x -= drag.x;
-				if (changeAnim) animation.play("walk");
+				if (changeAnim)
+				{
+					animation.play("walk");					
+					weapon.animation.play("walk");					
+				}
 			}
 			
 			if (FlxG.keys.anyPressed(["RIGHT"]))
@@ -150,7 +195,11 @@ class PlayerBrawl extends FlxSprite
 				flipX = false;
 				weapon.flipX = false;
 				acceleration.x += drag.x;
-				if (changeAnim) animation.play("walk");
+				if (changeAnim)
+				{
+					animation.play("walk");
+					weapon.animation.play("walk");
+				}
 			}
 		}
 	}
