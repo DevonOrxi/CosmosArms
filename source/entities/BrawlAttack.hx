@@ -1,7 +1,7 @@
 package entities;
 
 import flixel.FlxSprite;
-import flixel.group.FlxTypedGroup;
+import flixel.group.FlxGroup.FlxTypedGroup;
 
 /**
  * ...
@@ -18,13 +18,13 @@ class BrawlAttack extends FlxSprite
 		
 		loadGraphic("assets/images/characterWeapon.png", true, 128, 128);
 		
-		animation.add("idle", [2], 12, false);
-		animation.add("walk", [6, 7, 8], 7, true);
-		animation.add("hitFloor1", [12, 13, 14, 15, 16,17], 18, false);
-		animation.add("hitFloor2", [18, 19, 20, 21, 22, 23], 18, false);
+		animation.add("idle", [0], 12, false);
+		animation.add("walk", [10, 11, 12, 13, 14, 15], 10, true);
+		animation.add("hitFloor1", [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], 14, false);
+		animation.add("hitFloor2", [30, 31, 32, 33, 34, 35, 36, 37, 38, 39], 16, false);
 		animation.add("prejump", [2,2], 30, false);
-		animation.add("jumping", [1,1], 30, false);
-		animation.add("landing", [2,2], 20, false);	
+		animation.add("jumping", [2,2], 30, false);
+		animation.add("landing", [0,0], 20, false);
 		
 		width = 24;
 		height = 85;
@@ -36,7 +36,7 @@ class BrawlAttack extends FlxSprite
 		enemyHitList = new FlxTypedGroup<Enemy>();
 	}
 	
-	override public function update():Void
+	override public function update(elapsed:Float):Void
 	{
 		if (animation.name != prevAnim)
 		{
@@ -44,7 +44,7 @@ class BrawlAttack extends FlxSprite
 			prevAnim = animation.name;
 		}
 			
-		super.update();
+		super.update(elapsed);
 	}
 	
 	public function get_enemyHitList():FlxTypedGroup<Enemy>

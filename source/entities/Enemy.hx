@@ -19,12 +19,12 @@ class Enemy extends FlxSprite
 		velocity.x = -200;
 	}
 	
-	override public function update():Void
+	override public function update(elapsed:Float):Void
 	{
 		if (x < 0 || x > FlxG.width - width)
 			velocity.x *= -1;
 		
-		super.update();
+		super.update(elapsed);
 	}	
 	
 }

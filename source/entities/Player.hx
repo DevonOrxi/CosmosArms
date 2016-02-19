@@ -1,8 +1,7 @@
 package entities;
 
 import flixel.FlxSprite;
-import flixel.util.loaders.TexturePackerData;
-import flixel.util.FlxPoint;
+import flixel.math.FlxPoint;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.util.FlxSpriteUtil;
@@ -43,16 +42,16 @@ class Player extends FlxSprite
 		weapon = new Attack();
 	}
 	
-	override public function update()
+	override public function update(elapsed:Float):Void
 	{
 		playerInput();
 		
-		super.update();
+		super.update(elapsed);
 		
 		weapon.setPosition(x, y);
 	}
 	
-	private function playerInput()
+	private function playerInput():Void
 	{		
 		acceleration.x = 0;
 		
@@ -127,7 +126,7 @@ class Player extends FlxSprite
 		}
 	}
 	
-	private function moveLeftRight(changeAnim:Bool = false)
+	private function moveLeftRight(changeAnim:Bool = false):Void
 	{
 		if (!(FlxG.keys.anyPressed(["LEFT"]) && FlxG.keys.anyPressed(["RIGHT"])))
 		{					

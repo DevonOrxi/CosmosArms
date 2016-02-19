@@ -1,7 +1,7 @@
 package entities;
 
 import flixel.FlxSprite;
-import flixel.group.FlxTypedGroup;
+import flixel.group.FlxGroup.FlxTypedGroup;
 
 /**
  * ...
@@ -27,7 +27,7 @@ class Attack extends FlxSprite
 		enemyHitList = new FlxTypedGroup<Enemy>();
 	}
 	
-	override public function update():Void
+	override public function update(elapsed:Float):Void
 	{
 		if (animation.name != prevAnim)
 		{
@@ -35,7 +35,7 @@ class Attack extends FlxSprite
 			prevAnim = animation.name;
 		}
 			
-		super.update();
+		super.update(elapsed);
 	}
 	
 	public function get_enemyHitList():FlxTypedGroup<Enemy>

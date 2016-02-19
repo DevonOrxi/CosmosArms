@@ -1,7 +1,7 @@
 package entities;
 
 import flixel.FlxSprite;
-import flixel.util.FlxPoint;
+import flixel.math.FlxPoint;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.util.FlxSpriteUtil;
@@ -24,13 +24,13 @@ class PlayerBrawl extends FlxSprite
 		
 		loadGraphic("assets/images/character.png", true, 128, 128);
 		
-		animation.add("idle", [2], 12, false);
-		animation.add("walk", [6, 7, 8], 7, true);
-		animation.add("hitFloor1", [12, 13, 14, 15, 16,17], 19, false);
-		animation.add("hitFloor2", [18, 19, 20, 21, 22, 23], 19, false);
+		animation.add("idle", [0], 12, false);
+		animation.add("walk", [10, 11, 12, 13, 14, 15], 10, true);
+		animation.add("hitFloor1", [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], 14, false);
+		animation.add("hitFloor2", [30, 31, 32, 33, 34, 35, 36, 37, 38, 39], 16, false);
 		animation.add("prejump", [2,2], 30, false);
-		animation.add("jumping", [1,1], 30, false);
-		animation.add("landing", [2,2], 20, false);		
+		animation.add("jumping", [2,2], 30, false);
+		animation.add("landing", [0,0], 20, false);
 		
 		animation.play("idle");
 		
@@ -47,16 +47,16 @@ class PlayerBrawl extends FlxSprite
 		weapon = new BrawlAttack();
 	}
 	
-	override public function update()
+	override public function update(elapsed:Float):Void
 	{
 		playerInput();
 		
 		weapon.setPosition(x, y);	
 		
-		super.update();
+		super.update(elapsed);
 	}
 	
-	private function playerInput()
+	private function playerInput():Void
 	{		
 		acceleration.x = 0;
 		
@@ -174,7 +174,7 @@ class PlayerBrawl extends FlxSprite
 		}
 	}
 	
-	private function moveLeftRight(changeAnim:Bool = false)
+	private function moveLeftRight(changeAnim:Bool = false):Void
 	{
 		if (!(FlxG.keys.anyPressed(["LEFT"]) && FlxG.keys.anyPressed(["RIGHT"])))
 		{					

@@ -9,8 +9,9 @@ import flixel.FlxState;
 import flixel.tile.FlxTilemap;
 import flixel.addons.editors.ogmo.FlxOgmoLoader;
 import flixel.FlxObject;
-import flixel.util.FlxPoint;
+import flixel.math.FlxPoint;
 import flixel.util.FlxSpriteUtil;
+import flixel.FlxCamera;
 
 
 class PlayState extends FlxState
@@ -31,13 +32,16 @@ class PlayState extends FlxState
 	{
 		super.create();
 		
-		loader = new FlxOgmoLoader("assets/data/sandbox.oel");
+		loader = new FlxOgmoLoader("assets/data/cz.oel");
 		
 		backgroundLevel = loader.loadTilemap("assets/images/mininicular.png", 16, 16, "bTiles");
 		
 		foregroundLevel = loader.loadTilemap("assets/images/mininicular.png", 16, 16, "fTiles");
 		foregroundLevel.setTileProperties(50, FlxObject.NONE);
 		foregroundLevel.setTileProperties(51, FlxObject.NONE);
+		foregroundLevel.setTileProperties(1, FlxObject.ANY);
+		foregroundLevel.setTileProperties(2, FlxObject.ANY);
+		foregroundLevel.setTileProperties(3, FlxObject.ANY);
 		
 		player = new PlayerBrawl(300, 300);
 		enemy = new Enemy(500, 350);
@@ -58,7 +62,10 @@ class PlayState extends FlxState
 		transparent.scrollFactor.y = 0;
 		
 		
-		FlxG.camera.follow(player);
+		FlxG.camera.setScrollBoundsRect(foregroundLevel.x,  foregroundLevel.y, foregroundLevel.width,  foregroundLevel.height, true);
+		
+		FlxG.camera.target = player;
+		FlxG.camera.style = FlxCameraFollowStyle.PLATFORMER;
 		
 		add(space);
 		add(player.get_weapon());
@@ -74,11 +81,11 @@ class PlayState extends FlxState
 		super.destroy();
 	}
 	
-	override public function update():Void
+	override public function update(elapsed:Float):Void
 	{		
-		super.update();
+		super.update(elapsed);
 		
-		FlxG.overlap(foregroundLevel, player, null, FlxObject.separate);
+		FlxG.collide(foregroundLevel, player);
 		
 		if (FlxG.pixelPerfectOverlap(enemy, player.get_weapon()) &&
 			player.get_weapon().get_enemyHitList().members.indexOf(enemy) == -1
@@ -88,10 +95,10 @@ class PlayState extends FlxState
 			trace("HIT");
 		}
 		
-		var screenXY:FlxPoint = player.get_weapon().getScreenXY();
+		var screenXY:FlxPoint = player.get_weapon().getScreenPosition();
 		FlxSpriteUtil.fill(transparent, 0x00000000);
-		playerFrame.loadGraphic(player.get_weapon().getFlxFrameBitmapData());
-		spaceFrame.loadGraphic(space.getFlxFrameBitmapData());
+		playerFrame.loadGraphic(player.get_weapon().updateFramePixels());
+		spaceFrame.loadGraphic(space.updateFramePixels());
 		transparent.stamp(
 			playerFrame,
 			Std.int(screenXY.x - player.get_weapon().offset.x),
