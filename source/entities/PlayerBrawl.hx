@@ -14,6 +14,9 @@ class PlayerBrawl extends FlxSprite
 {
 	@:isVar private var weapon(get, null):BrawlAttack;
 	private var jumpTimer:Float = 0;
+	
+	@:isVar private var subHealth(get, null):Int = 100;
+	@:isVar private var pegHealth(get, null):Int = 16;
 
 	public function new(X:Int, Y:Int) 
 	{
@@ -207,5 +210,13 @@ class PlayerBrawl extends FlxSprite
 	public function get_weapon():BrawlAttack
 	{
 		return weapon;
+	}
+	public function get_subHealth():Int
+	{
+		return subHealth;
+	}
+	public function get_pegHealth():Int
+	{
+		return pegHealth;
 	}
 }
