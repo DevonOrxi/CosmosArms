@@ -54,7 +54,10 @@ class BossState extends FlxState
 		foregroundLevel.setTileProperties(35, FlxObject.NONE);
 		
 		player = new Player(300, 300);
+		Reg.playerRef = player;
+		
 		boss = new Boss(500, 350);
+		Reg.bossRef = boss;
 		
 		space = new FlxSprite();
 		space.loadGraphic("assets/images/space.png", true, 720, 480);

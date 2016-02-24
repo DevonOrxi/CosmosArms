@@ -5,6 +5,7 @@ import flixel.math.FlxPoint;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.util.FlxSpriteUtil;
+import flixel.tweens.FlxTween;
 
 /**
  * ...
@@ -43,10 +44,7 @@ class Boss extends Enemy
 		offset.y = 83;
 		flipX = true;
 		
-		drag.x = Reg.movementSpeed * 4;
 		acceleration.y = Reg.gravity;
-		
-		maxVelocity.set(Reg.maxPlayerVelocityX, Reg.maxPlayerVelocityY);
 		
 		weapon = new Attack();
 	}
@@ -74,29 +72,56 @@ class Boss extends Enemy
 					waitTimer = 0;
 					animation.play("charge");
 					FlxG.sound.play("assets/sounds/charge.wav");
+					FlxTween.color(this, Reg.bossChargeTime, 0xFFFFFFFF, 0xFF0000FF);						
+					checkPlayerPos();
 				}
 				
-			case "charge":				
+			case "charge":
+				
 				if (waitTimer >= Reg.bossChargeTime)
 				{
+					color = 0xFFFFFFFF;
 					waitTimer = 0;
 					animation.play("dash1");
 					FlxG.sound.play("assets/sounds/sword.wav");
+					
+					if (Reg.playerRef.getMidpoint().x <= getMidpoint().x)
+						velocity.x = -3000;
+					else
+						velocity.x = 3000;
+					
+					checkPlayerPos();
 				}
 				
 			case "dash1":
+				if (waitTimer >= Reg.bossDashTime)
+					velocity.x = 0;
+					
 				if (waitTimer >= Reg.bossSlashTime)
 				{
+					color = 0xFFFFFFFF;
 					waitTimer = 0;
 					animation.play("dash2");
 					FlxG.sound.play("assets/sounds/sword.wav");
+					
+					if (Reg.playerRef.getMidpoint().x <= getMidpoint().x)
+						velocity.x = -3000;
+					else
+						velocity.x = 3000;
+					
+					checkPlayerPos();
 				}
 				
 			case "dash2":
-				if (animation.finished)
+				if (waitTimer >= Reg.bossDashTime)
+					velocity.x = 0;
+					
+				if (waitTimer >= Reg.bossSlashTime)
 				{
 					waitTimer = 0;
 					animation.play("idle");
+					
+					checkPlayerPos();
 				}
 				
 			case "jumping":
@@ -106,6 +131,18 @@ class Boss extends Enemy
 				
 				
 		}
+	}
+	
+	private function checkPlayerPos():Void
+	{
+		if (velocity.x > 0)
+			flipX = false;
+		else if (velocity.x < 0)
+			flipX = true;
+		else if (Reg.playerRef.getMidpoint().x <= getMidpoint().x)
+			flipX = true;
+		else
+			flipX = false;
 	}
 	
 	public function get_weapon():Attack
