@@ -12,8 +12,12 @@ import flixel.util.FlxSpriteUtil;
  */
 class Player extends FlxSprite
 {
-	private var canJump:Bool = false;
 	@:isVar private var weapon(get, null):Attack;
+	private var jumpTimer:Float = 0;
+	
+	@:isVar private var subHealth(get, null):Int = 100;
+	public var pegHealth:Int = 16;
+	//@:isVar private var pegHealth(get, null):Int = 16;
 
 	public function new(X:Int, Y:Int) 
 	{
@@ -22,22 +26,27 @@ class Player extends FlxSprite
 		x = X;
 		y = Y;
 		
-		loadGraphic("assets/images/galford.png", true, 90, 46);
+		loadGraphic("assets/images/character.png", true, 128, 128);
 		
-		animation.add("idle", [24, 23, 22, 21, 20, 19, 18, 17], 12, true);
-		//animation.add("walk", [28,27,26,25], 10, true);
-		animation.add("walk", [32, 31, 30, 29], 12, true);
-		animation.add("hitFloor1", [16, 15, 14, 13, 12, 11, 10], 15, false);
-		animation.add("hitFloor2", [9, 8, 7, 6, 5, 4, 3], 15, false);
+		animation.add("idle", [0], 12, false);
+		animation.add("walk", [10, 11, 12, 13, 14, 15], 10, true);
+		animation.add("hitFloor1", [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], 14, false);
+		animation.add("hitFloor2", [30, 31, 32, 33, 34, 35, 36, 37, 38, 39], 16, false);
 		animation.add("prejump", [2,2], 30, false);
-		animation.add("jumping", [1,1], 30, false);
-		animation.add("landing", [0,0], 20, false);		
+		animation.add("jumping", [2,2], 30, false);
+		animation.add("landing", [0,0], 20, false);
 		
 		animation.play("idle");
 		
-		drag.x = Reg.movementSpeed;
+		width = 24;
+		height = 85;
+		offset.x = 46;
+		offset.y = 34;
+		
+		drag.x = Reg.movementSpeed * 4;
 		acceleration.y = Reg.gravity;
-		maxVelocity = FlxPoint.weak(Reg.maxPlayerVelocityX, Reg.maxPlayerVelocityY);
+		
+		maxVelocity.set(Reg.maxPlayerVelocityX, Reg.maxPlayerVelocityY);
 		
 		weapon = new Attack();
 	}
@@ -46,9 +55,9 @@ class Player extends FlxSprite
 	{
 		playerInput();
 		
-		super.update(elapsed);
+		weapon.setPosition(x, y);	
 		
-		weapon.setPosition(x, y);
+		super.update(elapsed);
 	}
 	
 	private function playerInput():Void
@@ -58,10 +67,13 @@ class Player extends FlxSprite
 		switch(animation.name)
 		{
 			case "idle":
-				moveLeftRight(true);			
+				moveLeftRight(true);
 				
-				if (FlxG.keys.anyJustPressed(["UP", "Z"]) && velocity.y == 0)
+				if (FlxG.keys.anyJustPressed(["UP", "Z"]) && isTouching(FlxObject.DOWN))
+				{
 					animation.play("prejump");
+					weapon.animation.play("prejump");
+				}
 				else if (FlxG.keys.anyJustPressed(["X"]))
 				{
 					animation.play("hitFloor1");
@@ -71,8 +83,11 @@ class Player extends FlxSprite
 			case "walk":
 				moveLeftRight(true);
 				
-				if (FlxG.keys.anyJustPressed(["UP", "Z"]) && velocity.y == 0)
+				if (FlxG.keys.anyJustPressed(["UP", "Z"]) && isTouching(FlxObject.DOWN))
+				{
 					animation.play("prejump");
+					weapon.animation.play("prejump");
+				}
 				else if (FlxG.keys.anyJustPressed(["X"]))
 				{
 					animation.play("hitFloor1");
@@ -86,18 +101,47 @@ class Player extends FlxSprite
 				
 			case "prejump":
 					velocity.y = -Reg.jumpForceSpeed;
-					acceleration.y = Reg.gravity;
 					animation.play("jumping");
+					weapon.animation.play("jumping");
+					jumpTimer = 0;
 				
 			case "jumping":
-				moveLeftRight(false);			
+				moveLeftRight(false);
 				
-				if (velocity.y == 0)
-					if(acceleration.x == 0)
+				if (isTouching(FlxObject.DOWN))
+					if (acceleration.x == 0)
+					{
 						animation.play("landing");
+						weapon.animation.play("landing");
+					}
 					else
+					{
 						animation.play("walk");
-					
+						weapon.animation.play("walk");
+						}
+				else
+				{
+					if (jumpTimer < Reg.maxJumpTime)
+					{
+						jumpTimer += FlxG.elapsed;
+						
+						if (FlxG.keys.anyPressed(["UP", "Z"]))
+							{velocity.y -= 18; acceleration.y = Reg.gravity / 2;}
+						else
+						{
+							jumpTimer = Reg.maxJumpTime;
+							acceleration.y = Reg.gravity;
+						}
+					}
+					else
+					{
+						jumpTimer = Reg.maxJumpTime;
+						acceleration.y = Reg.gravity;
+					}
+				}
+				
+				trace(acceleration.y);
+				
 			case "landing":
 				
 				if (animation.finished)
@@ -105,12 +149,20 @@ class Player extends FlxSprite
 					animation.play("idle");					
 					weapon.animation.play("idle");
 				}
-				else 
+				else if (FlxG.keys.anyJustPressed(["UP", "Z"]) && isTouching(FlxObject.DOWN))
+				{
+					animation.play("prejump");
+					weapon.animation.play("prejump");
+				}
+				else
 					moveLeftRight(true);
 					
 			case "hitFloor1":
 				if (animation.finished)
+				{
 					animation.play("idle");
+					weapon.animation.play("idle");
+				}
 				else if (FlxG.keys.anyJustPressed(["X"]))
 				{
 					animation.play("hitFloor2");					
@@ -135,7 +187,11 @@ class Player extends FlxSprite
 				flipX = true;
 				weapon.flipX = true;
 				acceleration.x -= drag.x;
-				if (changeAnim) animation.play("walk");
+				if (changeAnim)
+				{
+					animation.play("walk");					
+					weapon.animation.play("walk");					
+				}
 			}
 			
 			if (FlxG.keys.anyPressed(["RIGHT"]))
@@ -143,7 +199,11 @@ class Player extends FlxSprite
 				flipX = false;
 				weapon.flipX = false;
 				acceleration.x += drag.x;
-				if (changeAnim) animation.play("walk");
+				if (changeAnim)
+				{
+					animation.play("walk");
+					weapon.animation.play("walk");
+				}
 			}
 		}
 	}
@@ -151,5 +211,13 @@ class Player extends FlxSprite
 	public function get_weapon():Attack
 	{
 		return weapon;
+	}
+	public function get_subHealth():Int
+	{
+		return subHealth;
+	}
+	public function get_pegHealth():Int
+	{
+		return pegHealth;
 	}
 }

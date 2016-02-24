@@ -16,7 +16,7 @@
     <Width>72000</Width>
     <Height>480</Height>
   </LevelMaximumSize>
-  <Filename>C:\Users\Libido Destroyer\Desktop\bossvania.oep</Filename>
+  <Filename>D:\Projects\Code\HaxeFlixel\Metroidvania\assets\data\bossvania.oep</Filename>
   <AngleMode>Radians</AngleMode>
   <CameraEnabled>false</CameraEnabled>
   <CameraSize>
@@ -55,7 +55,7 @@
   <Tilesets>
     <Tileset>
       <Name>tiles</Name>
-      <FilePath>..\Downloads\scifitiles-sheet.png</FilePath>
+      <FilePath>..\images\scifitiles-sheet.png</FilePath>
       <TileSize>
         <Width>32</Width>
         <Height>32</Height>
@@ -75,6 +75,21 @@
       </Origin>
       <ImageDefinition DrawMode="Rectangle" ImagePath="" Tiled="false">
         <RectColor A="255" R="255" G="0" B="0" />
+      </ImageDefinition>
+      <ValueDefinitions />
+      <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
+    </EntityDefinition>
+    <EntityDefinition Name="boss" Limit="1" ResizableX="false" ResizableY="false" Rotatable="false" RotateIncrement="15">
+      <Size>
+        <Width>34</Width>
+        <Height>93</Height>
+      </Size>
+      <Origin>
+        <X>0</X>
+        <Y>0</Y>
+      </Origin>
+      <ImageDefinition DrawMode="Rectangle" ImagePath="" Tiled="false">
+        <RectColor A="255" R="255" G="255" B="0" />
       </ImageDefinition>
       <ValueDefinitions />
       <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />

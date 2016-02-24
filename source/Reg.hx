@@ -10,4 +10,9 @@ class Reg
 	public inline static var maxPlayerVelocityY:Int = 5000;
 	public inline static var maxJumpTime:Float = 0.15;
 	
+	
+	public inline static var bossIdleTime:Float = 3;
+	public inline static var bossChargeTime:Float = 1.75;
+	public inline static var bossSlashTime:Float = 0.8;
+	
 }

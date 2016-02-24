@@ -1,8 +1,9 @@
 package states;
 
+import entities.Boss;
 import entities.Enemy;
 import entities.Player;
-import entities.PlayerBrawl;
+import entities.Player;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -18,8 +19,8 @@ import flixel.ui.FlxBar;
 
 class BossState extends FlxState
 {
-	private var player:PlayerBrawl;
-	private var enemy:Enemy;
+	private var player:Player;
+	private var boss:Boss;
 	private var loader:FlxOgmoLoader;
 	private var foregroundLevel:FlxTilemap;
 	
@@ -52,8 +53,8 @@ class BossState extends FlxState
 		foregroundLevel.setTileProperties(34, FlxObject.NONE);
 		foregroundLevel.setTileProperties(35, FlxObject.NONE);
 		
-		player = new PlayerBrawl(300, 300);
-		enemy = new Enemy(500, 350);
+		player = new Player(300, 300);
+		boss = new Boss(500, 350);
 		
 		space = new FlxSprite();
 		space.loadGraphic("assets/images/space.png", true, 720, 480);
@@ -70,11 +71,11 @@ class BossState extends FlxState
 		transparent.scrollFactor.x = 0;
 		transparent.scrollFactor.y = 0;
 		
-		playerLifeBar = new FlxBar(12 + 5, 10 + 16, FlxBarFillDirection.BOTTOM_TO_TOP, 11, 128, player, "get_pegHealth()", 0, 16);
+		playerLifeBar = new FlxBar(12 + 5, 14 + 16, FlxBarFillDirection.BOTTOM_TO_TOP, 11, 128, player, "pegHealth", 0, 16);
 		playerLifeBar.createImageBar(null, AssetPaths.lifeBarContent__png, 0x00000000);
 		playerLifeBar.scrollFactor.set();
 		
-		playerLifeBarBackground = new FlxSprite(12, 10, AssetPaths.lifeBarEmpty__png);
+		playerLifeBarBackground = new FlxSprite(12, 14, AssetPaths.lifeBarEmpty__png);
 		playerLifeBarBackground.scrollFactor.set();
 		
 		bossMusic = new FlxSound();
@@ -88,7 +89,7 @@ class BossState extends FlxState
 		add(space);
 		add(player.get_weapon());
 		add(foregroundLevel);
-		add(enemy);
+		add(boss);
 		add(player);
 		add(playerLifeBarBackground);
 		add(playerLifeBar);
@@ -107,12 +108,13 @@ class BossState extends FlxState
 		super.update(elapsed);
 		
 		FlxG.collide(foregroundLevel, player);
+		FlxG.collide(foregroundLevel, boss);
 		
-		if (FlxG.pixelPerfectOverlap(enemy, player.get_weapon()) &&
-			player.get_weapon().get_enemyHitList().members.indexOf(enemy) == -1
+		if (FlxG.pixelPerfectOverlap(boss, player.get_weapon()) &&
+			player.get_weapon().get_enemyHitList().members.indexOf(boss) == -1
 		)
 		{
-			player.get_weapon().get_enemyHitList().add(enemy);
+			player.get_weapon().get_enemyHitList().add(boss);
 			trace("HIT");
 		}
 		

@@ -16,11 +16,20 @@ class Attack extends FlxSprite
 	{
 		super(X, Y, SimpleGraphic);
 		
-		loadGraphic("assets/images/sword.png", true, 90, 46);
-		animation.add("hitFloor1", [16, 15, 14, 13, 12, 11, 10], 15, false);
-		animation.add("hitFloor2", [9, 8, 7, 6, 5, 4, 3], 15, false);
-		animation.add("idle", [0], 20, false);
-		animation.play("idle");
+		loadGraphic("assets/images/characterWeapon.png", true, 128, 128);
+		
+		animation.add("idle", [0], 12, false);
+		animation.add("walk", [10, 11, 12, 13, 14, 15], 10, true);
+		animation.add("hitFloor1", [20, 21, 22, 23, 24, 25, 26, 27, 28, 29], 14, false);
+		animation.add("hitFloor2", [30, 31, 32, 33, 34, 35, 36, 37, 38, 39], 16, false);
+		animation.add("prejump", [2,2], 30, false);
+		animation.add("jumping", [2,2], 30, false);
+		animation.add("landing", [0,0], 20, false);
+		
+		width = 24;
+		height = 85;
+		offset.x = 46;
+		offset.y = 34;
 		
 		prevAnim = "idle";
 		

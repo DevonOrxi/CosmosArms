@@ -2,7 +2,7 @@ package states;
 
 import entities.Enemy;
 import entities.Player;
-import entities.PlayerBrawl;
+import entities.Player;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -16,7 +16,7 @@ import flixel.FlxCamera;
 
 class PlayState extends FlxState
 {
-	private var player:PlayerBrawl;
+	private var player:Player;
 	private var enemy:Enemy;
 	private var loader:FlxOgmoLoader;
 	private var foregroundLevel:FlxTilemap;
@@ -43,7 +43,7 @@ class PlayState extends FlxState
 		foregroundLevel.setTileProperties(2, FlxObject.ANY);
 		foregroundLevel.setTileProperties(3, FlxObject.ANY);
 		
-		player = new PlayerBrawl(300, 300);
+		player = new Player(300, 300);
 		enemy = new Enemy(500, 350);
 		
 		space = new FlxSprite();
