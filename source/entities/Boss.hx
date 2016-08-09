@@ -15,7 +15,10 @@ class Boss extends Enemy
 {
 	
 	@:isVar private var weapon(get, null):Attack;
+	
 	private var waitTimer:Float = 0;
+	private var warning:Bool = false;
+	private var state:String = "idle";
 	
 	@:isVar private var subHealth(get, null):Int = 100;
 	public var pegHealth:Int = 16;
@@ -63,7 +66,7 @@ class Boss extends Enemy
 		acceleration.x = 0;
 		waitTimer += FlxG.elapsed;
 		
-		switch(animation.name)
+		switch(state)
 		{
 			case "idle":
 				
@@ -71,18 +74,26 @@ class Boss extends Enemy
 				{
 					waitTimer = 0;
 					animation.play("charge");
+					state = "charge";
 					FlxG.sound.play("assets/sounds/charge.wav");
 					FlxTween.color(this, Reg.bossChargeTime, 0xFFFFFFFF, 0xFF0000FF);						
 					checkPlayerPos();
 				}
 				
 			case "charge":
+				if (waitTimer >= Reg.bossChargeWarning && !warning)
+				{
+					FlxG.sound.play("assets/sounds/warning.wav");
+					warning = true;
+				}
 				
 				if (waitTimer >= Reg.bossChargeTime)
 				{
 					color = 0xFFFFFFFF;
 					waitTimer = 0;
+					warning = false;
 					animation.play("dash1");
+					state = "dash1";
 					FlxG.sound.play("assets/sounds/sword.wav");
 					
 					if (Reg.playerRef.getMidpoint().x <= getMidpoint().x)
@@ -102,6 +113,7 @@ class Boss extends Enemy
 					color = 0xFFFFFFFF;
 					waitTimer = 0;
 					animation.play("dash2");
+					state = "dash2";
 					FlxG.sound.play("assets/sounds/sword.wav");
 					
 					if (Reg.playerRef.getMidpoint().x <= getMidpoint().x)
@@ -120,6 +132,7 @@ class Boss extends Enemy
 				{
 					waitTimer = 0;
 					animation.play("idle");
+					state = "idle";
 					
 					checkPlayerPos();
 				}
@@ -128,7 +141,6 @@ class Boss extends Enemy
 				
 				
 			case "landing":
-				
 				
 		}
 	}
